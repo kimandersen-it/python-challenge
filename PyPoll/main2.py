@@ -1,5 +1,4 @@
 
-encoding = "ISO-8859-1"
 # importing the operating system
 import os
 
@@ -14,20 +13,17 @@ with open(mypath, 'r' ) as pypollcsv:
     # establish reader and show delimiter
     csvread = csv.reader(pypollcsv, delimiter=',')
 
-    print(csvread)
+    #establish the export file
+    csvwrite = os.path.join("pypollwrite.txt")
 
     # read the header and go to the next row
     csv_header = next(csvread)
 
-
-    totalvotes = 0
+    #set variables
     totalcandidates = []
     candidatesnames = []
     candyvotes = {}
-    candidateperc = ["Candidate Name", "Percentage"]
-    calcperc = 0
     winner = 0
-    votecount = 0
     totalvotes = 0
     votespercand = 0
     voteperc = 0
@@ -38,38 +34,73 @@ with open(mypath, 'r' ) as pypollcsv:
         totalcandidates.append(eachrow)
         totalvotes = totalvotes + 1
 
-print("Election Results")
-print("-------------------------")
-print("Total Votes:" + str(totalvotes)
-print("-------------------------")
+    #open the text file to export to
+    with open(csvwrite, "w", encoding='utf8') as txtout:
+    #create the text
+        pypollvotes = (
+            f"Election Results\n"
+            f"-------------------------------\n"
+            f"Total Votes: {totalvotes}\n"
+            f"-------------------------------\n")
 
-    #total up the candidates votes each and put in a new list
+        #print to screen
+        print(pypollvotes)
+        #print to file
+        txtout.write(pypollvotes)
+
+
+     #total up the candidates votes each and put in a new list, add percentages
+
     for eachrow in totalcandidates:
+        #set the candidate to the row
         newcandidate = eachrow[2]
 
+        #if the candidate is not in the list
         if newcandidate not in candidatesnames:
+            #add the candidate
             candidatesnames.append(newcandidate)
+            #and set the votes to zero
             candyvotes[newcandidate] = 0
 
+        #now add a vote to the count for the candidate
         candyvotes[newcandidate] = candyvotes[newcandidate] + 1
 
+    #re-open the text file, append
+    with open(csvwrite, "a", encoding='utf8') as newtxt:
 
-    for eachrow in candyvotes:
+        #do the calculations
 
+        for eachrow in candyvotes:
 
+            #get each row in candyvotes and store the value
+            votespercand = candyvotes.get(eachrow)
 
-        votespercand = candyvotes.get(eachrow)
+            #calculate the percentages
+            voteperc = (float(votespercand) / float(totalvotes) * 100)
 
-        voteperc = float(votespercand) / float(totalvotes) * 100
+            #find the winner. "winner" stores highest number, "windcand" stores the name
+            if votespercand > winner:
+                winner = votespercand
+                wincand = eachrow
 
-       if (votespercand > winner):
-            winner = votespercand
+            #create field with  each candidate's votes and percentages
+            prcand = f"{eachrow}: {voteperc:.3f}% ({votespercand})\n"
 
-            wincand = eachrow
-    print("-------------------------")
-    print(wind)
-print(candidatesnames)
-print(candyvotes)
-print (votespercand)
-print (wincand)
-print (voteperc)
+            #print to screen
+            print(prcand)
+            #print to file
+            newtxt.write(prcand)
+
+    #reopen the text file for the final printing
+    with open(csvwrite, "a", encoding='utf8') as fintxt:
+
+        #set the text
+        printfinal = (
+            f"-------------------------------\n"
+            f"Winner:  {wincand}\n"
+            f"-------------------------------\n"
+            )
+        # print to screen
+        print(printfinal)
+        # print to file
+        fintxt.write(printfinal)
