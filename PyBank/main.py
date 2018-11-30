@@ -18,8 +18,6 @@ with open(mypath, 'r' ) as budgetcsv:
 
     # read the header
     csv_header = next(csvread)
-    print(f"CSV Header: {csv_header}")
-
 
     # set total to 0 so header isn't counted, set all other int variables to 0
     totmon = 0
@@ -29,6 +27,8 @@ with open(mypath, 'r' ) as budgetcsv:
     greatinc = 0
     greatdec = 0
     diffcell = 0
+    avesum = 0
+    avenum = 0.0
 
 
     #begin the calculations
@@ -54,6 +54,9 @@ with open(mypath, 'r' ) as budgetcsv:
         #look at the difference
         diffcell = (currcell - prevcell)
 
+        #total up the differences for the average
+        avesum = (avesum + diffcell)
+
         #if the greatest increase so far is less than the difference
         if greatinc < diffcell:
             #set the greatest increase to the current difference
@@ -69,16 +72,20 @@ with open(mypath, 'r' ) as budgetcsv:
             # and grab the first column of the cell for month/year
            decmon = (eachrow[0])
 
-    avenum = (total/totmon)
+    #figure out the average of the changes
+    avenum = (avesum / (totmon - 1))
 
-    #print everything
-    print(f'There are ' + 	str(totmon) + ' different months in the csv file.')
+    #format and print everything
 
-    print(f'The total/net of Profit/Loss is ' + str(total))
+    printall = (
+        f"Financial Analysis\n"
+        f"-----------------------------\n"
+        f"Total Months: {totmon}\n"
+        f"Total : ${total}\n"   
+        f"Average Change: ${avenum:.2f}\n"   
+        f"Greatest Increase in Profits: {greatmon} (${greatinc})\n"
+        f"Greatest Decrease in Profits: {decmon} (${greatdec})\n"
+         )
+    print(printall)
 
-    print(f'The average change is ' + str(avenum))
-
-    print(f'The month and year with the greatest increase was ' + greatmon + ', and that amount was ' + str(greatinc))
-
-    print(f'The month and year with the greatest decrease was ' + decmon + ', and that amount was ' + str(greatdec))
 
